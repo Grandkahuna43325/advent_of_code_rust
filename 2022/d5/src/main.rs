@@ -26,110 +26,95 @@ struct MoveVec {
 }
 
 fn main() {
-    let input = fs::read_to_string("./input.txt").unwrap();
+    let instructions = fs::read_to_string("./input.txt").unwrap();
 
-    let mut instructions = vec![];
-    let mut instructions_iter = vec![];
-
-    for line in input.lines() {
+    let mut instructions_vec = vec![];
+    for line in instructions.lines() {
         let splited: Vec<&str> = line.split(" ").collect();
-        let instruction = Move {
+        instructions_vec.push(Move {
             how_much: splited[1].parse().unwrap(),
             from: splited[3].parse().unwrap(),
             to: splited[5].parse().unwrap(),
-        };
-        instructions.push(instruction);
-        instructions_iter.push(instruction);
+        });
     }
+    let instructions_vec_part2 = instructions_vec.clone();
 
     let input_crates = fs::read_to_string("./input_crates.txt").unwrap();
-
     let mut lines = input_crates.lines();
 
-    let mut stackvec = vec![];
-    for i in 1..=9 {
+    let mut stack_vec = vec![];
+    let mut stack_vec_2 = vec![];
+    for stack_number in 1..=9 {
         let mut contents = vec![];
-        while let Some(ch) = is_anumber(lines.next().unwrap().to_string()) {
+        while let Some(ch) = is_a_number(lines.next().unwrap().to_string()) {
             contents.push(ch);
         }
         contents.reverse();
 
-        let stack = Stack {
-            stack_number: i,
+        stack_vec.push(Stack {
+            stack_number,
+            contents: contents.clone(),
+        });
+        stack_vec_2.push(Stack {
+            stack_number,
             contents,
-        };
-        stackvec.push(stack);
+        });
     }
-    // [stack1, stack2, stack3, stack4, stack5, stack6, stack7, stack8, stack9] 
 
+    let reverse = false;
+    let mut stack_vec = execute_instructions(instructions_vec, stack_vec, reverse);
+    let reverse = true;
+    let mut stack_vec_2 = execute_instructions(instructions_vec_part2, stack_vec_2, reverse);
 
+    let mut part_one = String::from("");
 
-    let mut tempinstructions = vec![];
-    let temp = Move{from:1, to: 2, how_much:2};
-    tempinstructions.push(temp);
-    // let temp = Move{from:3, to: 4, how_much:3};
-    // tempinstructions.push(temp);
-
-
-
-
-let mut char = 'x';
-let mut charvec = vec![];
-
-    for instruction in instructions {
-        for i in 1..=instruction.how_much {
-            char = match instruction.from {
-                x if x == 1 => {
-                    stackvec[0].contents.pop().unwrap()
-                },
-                x if x == 2 => {
-                    stackvec[1].contents.pop().unwrap()
-                },
-                x if x == 3 => {
-                    stackvec[2].contents.pop().unwrap()
-                },
-                x if x == 4 => {
-                    stackvec[3].contents.pop().unwrap()
-                },
-                x if x == 5 => {
-                    stackvec[4].contents.pop().unwrap()
-                },
-                x if x == 6 => {
-                    stackvec[5].contents.pop().unwrap()
-                },
-                x if x == 7 => {
-                    stackvec[6].contents.pop().unwrap()
-                },
-                x if x == 8 => {
-                    stackvec[7].contents.pop().unwrap()
-                },
-                x if x == 9 => {
-                    stackvec[8].contents.pop().unwrap()
-                },
-                _ => {'x'}
-            };
-            charvec.push(char);
-
-        }
-        charvec.reverse();
-        for ch in &charvec {
-            stackvec[instruction.to as usize -1].contents.push(*ch);
-        }
-        charvec.clear();
-        char = 'x'
-    }
     for i in 0..9 {
-        println!("{:?}", stackvec[i].contents);
+        part_one.push(stack_vec[i].contents.pop().unwrap());
     }
+    println!(r#"Part 1: "{part_one}" "#);
+
+    let mut part_two = String::from("");
+
+    for i in 0..9 {
+        part_two.push(stack_vec_2[i].contents.pop().unwrap());
+    }
+    println!(r#"Part 2: "{part_two}" "#);
 }
 
-fn is_anumber(line: String) -> Option<char> {
+fn execute_instructions(
+    instructions_vec: Vec<Move>,
+    mut stackvec: Vec<Stack>,
+    reverse: bool,
+) -> Vec<Stack> {
+    let mut char_vec = vec![];
+
+    for instruction in instructions_vec {
+        for _ in 1..=instruction.how_much {
+            char_vec.push(
+                stackvec[instruction.from as usize - 1]
+                    .contents
+                    .pop()
+                    .unwrap(),
+            );
+        }
+        if reverse == true {
+            char_vec.reverse();
+        }
+        for ch in &char_vec {
+            stackvec[instruction.to as usize - 1].contents.push(*ch);
+        }
+        char_vec.clear();
+    }
+    stackvec
+}
+
+fn is_a_number(line: String) -> Option<char> {
     match line.parse::<i32>() {
         Ok(_) => None,
         Err(_) => {
-            let mut chars = line.chars();
-            chars.next();
-            chars.next()
+            let mut line = line.chars();
+            line.next();
+            line.next()
         }
     }
 }

@@ -10,9 +10,8 @@ struct Elf {
 #[derive(Debug)]
 struct AllElfs(Vec<Elf>);
 
+
 fn main() {
-
-
     let input = fs::read_to_string("./input.txt").unwrap();
 
     let mut elfs = AllElfs(vec![]);
@@ -30,28 +29,12 @@ fn main() {
         }
     }
 
-    let mut best = 0;
-    let mut second = 0;
-    let mut third = 0;
+    elfs.0.sort_by(|a, b| b.counter.cmp(&a.counter));
 
-    for elf in &elfs.0 {
-        if elf.counter > best {
-            best = elf.counter;
-        }
-    }
-
-    for elf in &elfs.0 {
-        if elf.counter > second && elf.counter != best {
-            second = elf.counter;
-        }
-    }
-
-    for elf in &elfs.0 {
-        if elf.counter > third && elf.counter != best && elf.counter != second {
-            third = elf.counter;
-        }
-    }
+    let mut x = elfs.0.iter();
+    let best = x.next().unwrap().counter;
+    let second = x.next().unwrap().counter;
+    let third = x.next().unwrap().counter;
 
     println!("Best: {}\nSecond: {}\nThird:{}\nCombined: {}",best, second, third, best + second + third);
-
 }
