@@ -1,4 +1,3 @@
-use std::arch::x86_64::_mm_set1_ps;
 use std::fs;
 
 #[derive(Debug)]
@@ -43,6 +42,7 @@ fn main() {
 
     }
 
+
     let mut counter = 0;
     for pair in &vector_of_pairs{
         if is_subset(pair.l1..=pair.l2, pair.r1..=pair.r2) {
@@ -50,13 +50,23 @@ fn main() {
 
         }
     }
-    println!("{}", counter);
+    println!("Part 1: {}", counter);
+
+
+    let mut counter = 0;
+    for pair in &vector_of_pairs{
+        if is_subset_inclusive(pair.l1..=pair.l2, pair.r1..=pair.r2) {
+            counter += 1;
+
+        }
+    }
+    println!("Part 2: {}", counter);
 
 
 }
 
 
-fn is_subset(set1: std::ops::RangeInclusive<i32>, set2: std::ops::RangeInclusive<i32>) -> bool {
+fn is_subset_inclusive(set1: std::ops::RangeInclusive<i32>, set2: std::ops::RangeInclusive<i32>) -> bool {
 
     let mut setl = vec![];
 
@@ -93,5 +103,40 @@ fn is_subset(set1: std::ops::RangeInclusive<i32>, set2: std::ops::RangeInclusive
 }
     
 
+fn is_subset(set1: std::ops::RangeInclusive<i32>, set2: std::ops::RangeInclusive<i32>) -> bool {
+
+    let mut setl = vec![];
+
+    for num in set1.clone() {
+        setl.push(num);
+    }
+
+    let mut setr = vec![];
+
+    for num in set2.clone() {
+        setr.push(num);
+    }
+
+    if setl[0] < setr[0] && setl[setl.len()-1] > setr[setr.len()-1] {
+        return true; 
+    }
+    if setr[0] < setl[0] && setr[setr.len()-1] > setl[setl.len()-1] {
+        return true; 
+    }
+
+    for num in set1.clone() {
+        if set2.contains(&num) {
+            return true;
+        }
+    }
+
+    for num in set2 {
+        if set1.contains(&num) {
+            return true;
+        }
+    }
+    false
+
+}
 
 

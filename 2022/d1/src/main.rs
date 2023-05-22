@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use std::fs;
 
 #[derive(Debug)]
@@ -51,8 +52,6 @@ fn main() {
         }
     }
 
-    println!("{}", best + second + third);
+    println!("Best: {}\nSecond: {}\nThird:{}\nCombined: {}",best, second, third, best + second + third);
 
-    // let best = elfs.0.into_iter().map(|x| x).max_by_key(|elf| elf.counter).unwrap();
-    // println!("{:?}", best);
 }
